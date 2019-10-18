@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -46,6 +47,7 @@ spawn(const char *bin, char **argv)
         execv(bin, argv);
         exit(0);
     }
+    wait(0);
 }
 
 int
