@@ -60,7 +60,7 @@ main(int argc, char **argv)
     char *feh_argv[argc + 2];
     feh_argv[0] = FEH_BIN;
     feh_argv[1] = "-z";
-    feh_argv[2] = "--bg-scale";
+    feh_argv[2] = "--bg-fill";
     for (int i = 2; i < argc; i++)
         feh_argv[i + 1] = argv[i];
     feh_argv[argc + 1] = 0;
