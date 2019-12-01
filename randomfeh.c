@@ -10,7 +10,7 @@
 
 #define FEH_BIN "/usr/bin/feh"
 
-static inline void
+static void
 die(const char *format, ...)
 {
     va_list ap;
@@ -20,7 +20,7 @@ die(const char *format, ...)
     exit(1);
 }
 
-static inline struct timespec
+static struct timespec
 parse_interval(const char *s)
 {
     char *end_interval;
@@ -37,7 +37,7 @@ parse_interval(const char *s)
     return res;
 }
 
-static inline void
+static void
 spawn(const char *bin, char **argv)
 {
     pid_t p = fork();
