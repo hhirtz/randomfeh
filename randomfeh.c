@@ -8,7 +8,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define FEH_BIN "/usr/bin/feh"
+#define FEH_BIN "/usr/bin/swaybg"
 
 static void
 die(const char *format, ...)
@@ -37,19 +37,6 @@ parse_interval(const char *s)
     return res;
 }
 
-static void
-spawn(const char *bin, char **argv)
-{
-    pid_t p = fork();
-    if (p < 0)
-        die("fork: %s\n", strerror(errno));
-    if (p == 0) {
-        execv(bin, argv);
-        exit(0);
-    }
-    wait(0);
-}
-
 int
 main(int argc, char **argv)
 {
@@ -57,18 +44,31 @@ main(int argc, char **argv)
         die("Usage: %s TIME PATHS...\n", argv[0]);
 
     struct timespec interval = parse_interval(argv[1]);
-    char *feh_argv[argc + 2];
+    char *feh_argv[4];
     feh_argv[0] = FEH_BIN;
-    feh_argv[1] = "-z";
-    feh_argv[2] = "--bg-fill";
-    for (int i = 2; i < argc; i++)
-        feh_argv[i + 1] = argv[i];
-    feh_argv[argc + 1] = 0;
+    feh_argv[1] = "-i";
+    feh_argv[3] = 0;
 
-    for (;;) {
-        spawn(FEH_BIN, feh_argv);
+    srand(time(0));
+    argc -= 2;
+    for (pid_t previous = 0;;) {
+        int i = (rand() % argc) + 2;
+        feh_argv[2] = argv[i];
+
+        pid_t p = fork();
+        if (p < 0)
+            die("fork: %s\n", strerror(errno));
+        if (p == 0) {
+            execv(FEH_BIN, feh_argv);
+            exit(0);
+        }
+        if (previous) {
+            kill(previous, SIGKILL);
+            waitpid(previous, 0, 0);
+        }
         if (nanosleep(&interval, 0) < 0)
             die("nanosleep: %s\n", strerror(errno));
+        previous = p;
     }
 
     return 0;
