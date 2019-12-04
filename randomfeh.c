@@ -44,6 +44,7 @@ main(int argc, char **argv)
         die("Usage: %s TIME PATHS...\n", argv[0]);
 
     struct timespec interval = parse_interval(argv[1]);
+    struct timespec wait_for_swaybg = { .tv_sec = 0, .tv_nsec = 500000000 };
     char *feh_argv[4];
     feh_argv[0] = FEH_BIN;
     feh_argv[1] = "-i";
@@ -62,6 +63,8 @@ main(int argc, char **argv)
             execv(FEH_BIN, feh_argv);
             exit(0);
         }
+        if (nanosleep(&wait_for_swaybg, 0) < 0)
+            die("nanosleep: %s\n", strerror(errno));
         if (previous) {
             kill(previous, SIGKILL);
             waitpid(previous, 0, 0);
